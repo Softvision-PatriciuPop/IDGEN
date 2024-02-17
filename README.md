@@ -16,8 +16,9 @@ The script uses pytest to wait for the user to input parameters. To run the scri
 - ```--env``` - requires the environment where the recipe is located. The options are: ```prod```, ```prod-preview```, ```stage```, or ```stage-preview```
 - ```--slug``` requires the slug found on the experiment's Nimbus page e.g. ```--slug ppop-grand-ui-check```
 - ```--region``` - OPTIONAL, sets the browser's search region to the provided string e.g. ```--region US```
+- ```-s``` - OPTIONAL, provides additional information in console about the process/stages of the script, recommended for the full experience.
 
-Example command: ```pytest --env prod --slug restore-fxa-toolbar-menu-desktop-existing-users```
+Example command: ```pytest --env prod --slug restore-fxa-toolbar-menu-desktop-existing-users -s```
 
 ## Notes
 - Avoid performing any actions while the script is running, as it might interfere with ID generation due to the nature of having to use a Firefox browser console.
