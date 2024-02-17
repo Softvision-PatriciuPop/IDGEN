@@ -1,4 +1,4 @@
-Welcome to <name>, a (windows-only) python only script that consumes Nimbus desktop experiment slugs to generate user IDs for every branch and create user.js files. Compatible with stage/prod as well as preview environemnts, it can also set extra values in the user.js files for easier enrollment.
+Welcome to <name>, a (windows-only) python script that consumes Nimbus desktop experiment slugs to generate user IDs for every branch and create user.js files. Compatible with stage/prod as well as preview environemnts, it can also set extra values in the user.js files for easier enrollment.
 
 The user.js files are created in separate folders with the same name as the branches to avoid confusion.
 
@@ -23,3 +23,4 @@ Example command: ```pytest --env prod --slug restore-fxa-toolbar-menu-desktop-ex
 - Avoid performing any actions while the script is running, as it might interfere with ID generation due to the nature of having to use a Firefox browser console.
 - Make sure the Experiment you are targeting is either Live or in Preview and that it has reached the appropriate Remote Settings collection.
 - For the preview collections, the script automatically changes the Nimbus collection preferences to ```nimbus-preview```
+- The script only works with Desktop experiments, for mobile experiments please use nimbus-cli.
