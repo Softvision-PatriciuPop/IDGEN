@@ -2,6 +2,8 @@ import pytest
 import re
 from pathlib import Path
 from termcolor import colored
+import pathlib
+import os
 
 
 class TestUserJsGeneration:
@@ -35,20 +37,28 @@ class TestUserJsGeneration:
             list_keys = list(result_dict.keys())
             list_values = list(result_dict.values())
 
+        #Create folder for the optput if it doesn't exist
+        output_folder = str(pathlib.Path(__file__).parent.resolve()) + '\\output'
+        print(output_folder)
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+
         # Creating folders for the experiment
         parent_folder_name = setup_function['experiment_slug']
-        parent_folder_path = Path.home() / "Desktop" / parent_folder_name
-        parent_folder_path.mkdir(parents=True, exist_ok=True)
+        parent_folder_path = output_folder + '\\' + parent_folder_name
+        os.makedirs(parent_folder_path)
 
         # Creating user.js files and folders for each branch
         counter = 0
         for i in list_keys:
             child_folder_name = i.replace('"', "")
-            child_folder_path = parent_folder_path / child_folder_name
-            child_folder_path.mkdir(parents=True, exist_ok=True)
+            os.chdir(parent_folder_path)
+            child_folder_path = parent_folder_path + '\\' + child_folder_name
+            os.makedirs(child_folder_path)
+            os.chdir(child_folder_path)
 
             split_id = list_values[counter]
-            with open(child_folder_path / "user.js", "x") as file:
+            with open("user.js", "x") as file:
                 file.write(f'user_pref("app.normandy.user_id", {split_id});')
                 # Adding stage endpoint + hash
                 if setup_function['environment'] == 'stage' or 'stage-preview':
