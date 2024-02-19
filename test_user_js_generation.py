@@ -1,6 +1,5 @@
 import pytest
 import re
-from pathlib import Path
 from termcolor import colored
 import pathlib
 import os
@@ -61,11 +60,11 @@ class TestUserJsGeneration:
             with open("user.js", "x") as file:
                 file.write(f'user_pref("app.normandy.user_id", {split_id});')
                 # Adding stage endpoint + hash
-                if setup_function['environment'] == 'stage' or 'stage-preview':
+                if setup_function['environment'] == "stage" or setup_function['environment'] == "stage-preview":
                     file.write(f'\nuser_pref("security.content.signature.root_hash", "3C:01:44:6A:BE:90:36:CE:A9:A0:9A:CA:A3:A5:20:AC:62:8F:20:A7:AE:32:CE:86:1C:B2:EF:B7:0F:A0:C7:45");')
                     file.write(f'\nuser_pref("services.settings.server", "https://firefox.settings.services.allizom.org/v1");')
                 # Adding preview collection for prod/stage
-                if setup_function['environment'] == 'stage-preview' or 'prod-preview':
+                if setup_function['environment'] == "stage-preview" or setup_function['environment'] == "prod-preview":
                     file.write(f'\nuser_pref("messaging-system.rsexperimentloader.collection_id", "nimbus-preview");')
                 # Adding browser search region
                 if region is not None:
