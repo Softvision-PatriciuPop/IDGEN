@@ -59,6 +59,7 @@ class TestUserJsGeneration:
             split_id = list_values[counter]
             with open("user.js", "x") as file:
                 file.write(f'user_pref("app.normandy.user_id", {split_id});')
+                file.write(f'user_pref("messaging-system.log", "all");')
                 # Adding stage endpoint + hash
                 if setup_function['environment'] == "stage" or setup_function['environment'] == "stage-preview":
                     file.write(f'\nuser_pref("security.content.signature.root_hash", "3C:01:44:6A:BE:90:36:CE:A9:A0:9A:CA:A3:A5:20:AC:62:8F:20:A7:AE:32:CE:86:1C:B2:EF:B7:0F:A0:C7:45");')
