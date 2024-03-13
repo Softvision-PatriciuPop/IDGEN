@@ -102,7 +102,7 @@ def setup_function(env, slug, check_slug_param):
     id_command = pre_command1 + pre_command2 + full_recipe
 
     # Focusing the browser console, entering the code snippet and copying the output
-    time.sleep(1)
+    time.sleep(2)
     browser_console_window = GW.getWindowsWithTitle("Parent process Browser Console")[0]
     browser_console_window.activate()
 
