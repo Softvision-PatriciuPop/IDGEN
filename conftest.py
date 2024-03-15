@@ -9,6 +9,7 @@ import time
 import os
 import pathlib
 import glob
+import pyperclip
 
 
 # Set the current Remote Settings endpoints
@@ -106,16 +107,12 @@ def setup_function(env, slug, check_slug_param):
     browser_console_window = GW.getWindowsWithTitle("Parent process Browser Console")[0]
     browser_console_window.activate()
 
-    pyautogui.write(id_command)
+    pyperclip.copy(id_command)
+    pyautogui.hotkey("ctrl", "v")
     pyautogui.hotkey("shift", "enter")
     pyautogui.write(post_command)
     pyautogui.press("enter")
-    if len(id_command) > 4000:
-        time.sleep(20)
-    if len(id_command) < 2000:
-        time.sleep(10)
-    else:
-        time.sleep(15)
+    time.sleep(3)
     pyautogui.press("tab")
     pyautogui.hotkey("ctrl", "a")
     pyautogui.hotkey("ctrl", "c")
