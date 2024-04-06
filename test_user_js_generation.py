@@ -3,6 +3,7 @@ import re
 from termcolor import colored
 import pathlib
 import os
+import shutil
 
 
 class TestUserJsGeneration:
@@ -36,7 +37,7 @@ class TestUserJsGeneration:
             list_keys = list(result_dict.keys())
             list_values = list(result_dict.values())
 
-        #Create folder for the optput if it doesn't exist
+        #Check if slug folder exists and makes one if not
         output_folder = str(pathlib.Path(__file__).parent.resolve()) + '\\output'
         print(output_folder)
         if not os.path.exists(output_folder):
@@ -45,7 +46,12 @@ class TestUserJsGeneration:
         # Creating folders for the experiment
         parent_folder_name = setup_function['experiment_slug']
         parent_folder_path = output_folder + '\\' + parent_folder_name
-        os.makedirs(parent_folder_path)
+        if not os.path.exists(parent_folder_path):
+            os.makedirs(parent_folder_path)
+        else:
+            print(colored('\n Existing IDs generated for this slug, overwriting folder.', 'yellow'))
+            shutil.rmtree(parent_folder_path)
+            os.makedirs(parent_folder_path)
 
         # Creating user.js files and folders for each branch
         counter = 0
@@ -73,4 +79,4 @@ class TestUserJsGeneration:
 
             counter += 1
         print('\n User.js files created')
-        print(colored('\n --------DONE!--------', 'green'))
+        print(colored('\n =======DONE!=======', 'green'))

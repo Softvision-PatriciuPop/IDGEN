@@ -3,8 +3,6 @@ import pytest
 import pygetwindow as GW
 import pyautogui
 import requests
-import json
-import pyperclip
 import time
 import os
 import pathlib
@@ -18,17 +16,34 @@ prod_preview_link = 'https://firefox.settings.services.mozilla.com/v1/buckets/ma
 stage_link = 'https://firefox.settings.services.allizom.org/v1/buckets/main/collections/nimbus-desktop-experiments/records'
 stage_preview_link = 'https://firefox.settings.services.allizom.org/v1/buckets/main/collections/nimbus-preview/records'
 
+
 @pytest.fixture(scope="class", autouse=True)
 def check_env_param(env):
     # Dynamic endpoint selection based on provided environment in --env and checking for a valid env
     if env == "prod":
-        return requests.get(prod_link)
+        endpoint_url = prod_link
+        return {
+            "records": requests.get(prod_link),
+            "endpoint_url": endpoint_url
+        }
     elif env == "prod-preview":
-        return requests.get(prod_preview_link)
+        endpoint_url = prod_preview_link
+        return {
+            "records": requests.get(prod_preview_link),
+            "endpoint_url": endpoint_url
+        }
     elif env == "stage":
-        return requests.get(stage_link)
+        endpoint_url = stage_link
+        return {
+            "records": requests.get(stage_link),
+            "endpoint_url": endpoint_url
+        }
     elif env == "stage-preview":
-        return requests.get(stage_preview_link)
+        endpoint_url = stage_preview_link
+        return {
+            "records": requests.get(stage_preview_link),
+            "endpoint_url": endpoint_url
+        }
     else:
         sys.exit("Invalid environment!")
 
@@ -37,7 +52,7 @@ def check_env_param(env):
 def check_slug_param(check_env_param, slug):
     # Pulling the selected endpoint, filtering the recipe's json based on the slug and checking if it's valid
     experiment_slug = slug
-    rs_payload = check_env_param.json()
+    rs_payload = check_env_param['records'].json()
 
     filtered_entries = [entry for entry in rs_payload['data'] if entry[
         'slug'] == experiment_slug]
@@ -50,8 +65,9 @@ def check_slug_param(check_env_param, slug):
     except IndexError:
         sys.exit("Invalid Slug!")
 
+
 def firefox_profile():
-    profile_path = os.getenv('APPDATA') + "\Mozilla\Firefox\Profiles"
+    profile_path = os.getenv('APPDATA') + r"\Mozilla\Firefox\Profiles"
     script_path = pathlib.Path(__file__).parent.resolve()
     firefox_path = str(script_path) + '\\core'
 
@@ -75,7 +91,7 @@ def firefox_profile():
 
         os.chdir(gen_profile_path)
         idgen_userjs = open("user.js", "a")
-        idgen_userjs.writelines([f'user_pref("devtools.chrome.enabled", true);', '\nuser_pref("browser.shell.checkDefaultBrowser", false);'])
+        idgen_userjs.writelines([f'user_pref("devtools.chrome.enabled", true);', '\nuser_pref("browser.shell.checkDefaultBrowser", false);', '\nuser_pref("app.update.enabled", false);'])
         idgen_userjs.close()
         print('\n IDGEN profile created')
 
@@ -87,44 +103,44 @@ def firefox_profile():
         os.chdir(firefox_path)
         os.system(open_build_command)
 
-@pytest.fixture()
-def setup_function(env, slug, check_slug_param):
 
-    # Defining the user ID generation code snippet parts
-    pre_command1 = 'Cu.import("resource://gre/modules/Console.jsm");'
-    pre_command2 = 'Cu.import("resource://nimbus/lib/ExperimentManager.jsm");'
-    post_command = 'ExperimentManager.generateTestIds({...recipe, ...recipe.bucketConfig}).then(console.log)'
+@pytest.fixture()
+def setup_function(env, slug, check_slug_param, check_env_param):
 
     firefox_profile()
 
-    # Formatting the json output and assembling the code snippet
-    formatted_json = json.dumps(check_slug_param['extracted_dict'], separators=(',', ':'), ensure_ascii=False)
-    full_recipe = f"recipe = {formatted_json}"
-    id_command = pre_command1 + pre_command2 + full_recipe
+    # Assembling the code snippet
+    selected_endpoint_url = check_env_param['endpoint_url']
+    id_command = f'await ChromeUtils.importESModule("resource://nimbus/lib/ExperimentManager.sys.mjs").ExperimentManager.generateTestIds((await (await fetch ("{selected_endpoint_url}/{slug}")).json()).data)'
 
     # Focusing the browser console, entering the code snippet and copying the output
-    time.sleep(3)
-    browser_console_window = GW.getWindowsWithTitle("Parent process Browser Console")[0]
-    browser_console_window.activate()
+    while True:
+        try:
+            browser_console_window = GW.getWindowsWithTitle("Parent process Browser Console")[0]
+        except IndexError:
+            time.sleep(1)
+        else:
+            browser_console_window.activate()
+            break
 
     pyperclip.copy(id_command)
     pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("shift", "enter")
-    pyautogui.write(post_command)
     pyautogui.press("enter")
-    time.sleep(3)
+    time.sleep(1)
     pyautogui.press("tab")
     pyautogui.hotkey("ctrl", "a")
     pyautogui.hotkey("ctrl", "c")
     ids_raw = pyperclip.paste()
-    pyautogui.hotkey('alt', 'f4')
-    pyautogui.hotkey('alt', 'f4')
-    print("\nGenerated the following IDs:")
+    browser_console_window.close()
+    firefox_window = GW.getWindowsWithTitle("Firefox Nightly")[0]
+    firefox_window.close()
+    print("\n Generated the following IDs:")
     return {
         "rawid": ids_raw,
         "experiment_slug": check_slug_param['experiment_slug'],
         "environment": env
     }
+
 
 def pytest_addoption(parser):
     # Defining user input parameters
@@ -132,13 +148,16 @@ def pytest_addoption(parser):
     parser.addoption("--slug")
     parser.addoption("--region")
 
+
 @pytest.fixture(scope="class", autouse=True)
 def env(request):
     return request.config.getoption("--env")
 
+
 @pytest.fixture(scope="class", autouse=True)
 def slug(request):
     return request.config.getoption("--slug")
+
 
 @pytest.fixture(scope="class", autouse=True)
 def region(request):
