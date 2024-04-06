@@ -1,4 +1,4 @@
-Welcome to <name>, a (windows-only) python script that consumes Nimbus desktop experiment slugs to generate user IDs for every branch and create user.js files. Compatible with stage/prod as well as preview environemnts, it can also set extra values in the user.js files for easier enrollment.
+Welcome to <name>, a (windows-only) Python script that consumes Nimbus desktop experiment slugs to generate user IDs for every branch and create user.js files. Compatible with stage/prod as well as preview environments, it can also set extra values in the user.js files for easier enrollment.
 
 The user.js files are created in separate folders with the same name as the branches to avoid confusion.
 
