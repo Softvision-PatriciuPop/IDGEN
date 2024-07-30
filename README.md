@@ -14,7 +14,7 @@ The user.js files are created in separate folders with the same name as the bran
 ## Generating user IDs
 The script uses pytest to wait for the user to input parameters. To run the script open a new terminal and write ```pytest``` followed by any of the following commands:
 - ```--env``` - requires the environment where the recipe is located. The options are: ```prod```, ```prod-preview```, ```stage```, or ```stage-preview```
-- ```--env``` - with the support of arbitrary pref-flips, ```--env``` now also suports ```stage-secured``` and ```prod-secured```
+  - With the support of arbitrary pref-flips, ```--env``` now also suports ```stage-secured``` and ```prod-secured```
 - ```--slug``` requires the slug found on the experiment's Nimbus page e.g. ```--slug ppop-grand-ui-check```
 - ```--region``` - OPTIONAL, sets the browser's search region to the provided string e.g. ```--region US```
 - ```-s``` - OPTIONAL, provides additional information in console about the process/stages of the script, recommended for the full experience.
