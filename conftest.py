@@ -15,7 +15,8 @@ prod_link = 'https://firefox.settings.services.mozilla.com/v1/buckets/main/colle
 prod_preview_link = 'https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/nimbus-preview/records'
 stage_link = 'https://firefox.settings.services.allizom.org/v1/buckets/main/collections/nimbus-desktop-experiments/records'
 stage_preview_link = 'https://firefox.settings.services.allizom.org/v1/buckets/main/collections/nimbus-preview/records'
-
+prod_secured_experiments_link = 'https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/nimbus-secure-experiments/records'
+stage_secured_experiments_link = 'https://firefox.settings.services.allizom.org/v1/buckets/main/collections/nimbus-secure-experiments/records'
 
 @pytest.fixture(scope="class", autouse=True)
 def check_env_param(env):
@@ -42,6 +43,18 @@ def check_env_param(env):
         endpoint_url = stage_preview_link
         return {
             "records": requests.get(stage_preview_link),
+            "endpoint_url": endpoint_url
+        }
+    elif env == "prod-secured":
+        endpoint_url = prod_secured_experiments_link
+        return {
+            "records": requests.get(prod_secured_experiments_link),
+            "endpoint_url": endpoint_url
+        }
+    elif env == "stage-secured":
+        endpoint_url = stage_secured_experiments_link
+        return {
+            "records": requests.get(stage_secured_experiments_link),
             "endpoint_url": endpoint_url
         }
     else:
@@ -123,6 +136,7 @@ def setup_function(env, slug, check_slug_param, check_env_param):
             browser_console_window.activate()
             break
 
+    time.sleep(1)
     pyperclip.copy(id_command)
     pyautogui.hotkey("ctrl", "v")
     pyautogui.press("enter")
