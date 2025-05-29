@@ -124,7 +124,7 @@ def setup_function(env, slug, check_slug_param, check_env_param):
 
     # Assembling the code snippet
     selected_endpoint_url = check_env_param['endpoint_url']
-    id_command = f'await ChromeUtils.importESModule("resource://nimbus/lib/ExperimentManager.sys.mjs").ExperimentManager.generateTestIds((await (await fetch ("{selected_endpoint_url}/{slug}")).json()).data)'
+    id_command = f'await ChromeUtils.importESModule("resource://nimbus/ExperimentAPI.sys.mjs").ExperimentAPI.manager.generateTestIds((await (await fetch ("{selected_endpoint_url}/{slug}")).json()).data)'
 
     # Focusing the browser console, entering the code snippet and copying the output
     while True:

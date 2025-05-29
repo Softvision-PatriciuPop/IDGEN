@@ -65,6 +65,7 @@ class TestUserJsGeneration:
             split_id = list_values[counter]
             with open("user.js", "x") as file:
                 file.write(f'user_pref("app.normandy.user_id", {split_id});')
+                file.write(f'\nuser_pref("toolkit.telemetry.cachedProfileGroupID", {split_id});')
                 file.write(f'\nuser_pref("messaging-system.log", "all");')
                 # Adding stage endpoint + hash
                 if setup_function['environment'] == "stage" or setup_function['environment'] == "stage-preview":
